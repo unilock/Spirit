@@ -36,9 +36,8 @@
     "spirit.fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.12",
-    "fabric": "*",
-    "minecraft": "1.19.x",
-    "java": ">=17"
+    "fabricloader": "*",
+    "fabric-api": "*",
+    "minecraft": ">=1.19.2"
   }
 }

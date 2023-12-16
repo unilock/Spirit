@@ -1,8 +1,6 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
-
-def ENV = System.getenv()
 
 architectury {
     platformSetupLoomIde()
@@ -11,29 +9,37 @@ architectury {
 
 loom {
     forge {
-        mixinConfig "spirit.common.mixins.json"
+        mixinConfigs = [
+            "spirit.common.mixins.json"
+        ]
     }
 }
 
 configurations {
     common
-    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files.
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentForge.extendsFrom common
 }
 
+repositories {
+    maven { url = "https://maven.k-4u.nl" }
+}
+
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
-    include modApi("com.teamresourceful.resourcefullib:resourcefullib-forge-$rootProject.resourcefullib_version")
-    modCompileOnly ("mcjty.theoneprobe:theoneprobe:1.19-+:api") { transitive = false }
-    modRuntimeOnly ("mcjty.theoneprobe:theoneprobe:1.19-+") { transitive = false }
+
+    modApi "com.teamresourceful.resourcefullib:resourcefullib-forge-1.19.2:${rootProject.resourcefullib_version}"
+
+    modCompileOnly("mcjty.theoneprobe:theoneprobe:${rootProject.top_version}:api") { transitive = false }
+    modRuntimeOnly("mcjty.theoneprobe:theoneprobe:${rootProject.top_version}") { transitive = false }
 
     //modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:${rootProject.rei_version}"
-    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-forge: ${rootProject.rei_version}"
+    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-forge:${rootProject.rei_version}"
 
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }
 
 processResources {
@@ -42,6 +48,12 @@ processResources {
     filesMatching("META-INF/mods.toml") {
         expand "version": project.version
     }
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from(sourceSets.main.resources.srcDirs) {
+        include('**/data/spirit/recipes/**')
+        expand "common": "forge"
+    }
 }
 
 shadowJar {
@@ -49,18 +61,17 @@ shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier.set("dev-shadow")
 }
 
 remapJar {
-    input.set shadowJar.archiveFile
+    inputFile.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier null
+    archiveClassifier.set(null)
 }
 
 jar {
-    classifier "dev"
-    archivesBaseName = "$mod_id-forge-$minecraft_version"
+    archiveClassifier.set("dev")
 }
 
 sourcesJar {
@@ -69,20 +80,13 @@ sourcesJar {
     from commonSources.archiveFile.map { zipTree(it) }
 }
 
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    from(sourceSets.main.resources.srcDirs) {
-        include('**/data/spirit/recipes/**')
-        expand "common": "forge"
-    }
-}
-
-
 components.java {
     withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
         skip()
     }
 }
+
+def ENV = System.getenv()
 
 publishing {
     publications {
