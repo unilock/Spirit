@@ -1,7 +1,6 @@
 package me.codexadrian.spirit.blocks;
 
 import me.codexadrian.spirit.blocks.blockentity.PedestalBlockEntity;
-import me.codexadrian.spirit.blocks.blockentity.SoulCageBlockEntity;
 import me.codexadrian.spirit.registry.SpiritBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;

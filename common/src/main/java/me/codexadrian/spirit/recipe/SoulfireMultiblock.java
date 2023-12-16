@@ -3,7 +3,7 @@ package me.codexadrian.spirit.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import me.codexadrian.spirit.data.TagAndListSetCodec;
+import com.teamresourceful.resourcefullib.common.codecs.tags.HolderSetCodec;
 import net.minecraft.advancements.critereon.NbtPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
@@ -106,7 +106,7 @@ public record SoulfireMultiblock(List<List<String>> pattern, Map<String, Strippe
     public record StrippedBlockPredicate(Optional<HolderSet<Block>> blocks, Optional<CompoundTag> nbtTag) {
         public static final StrippedBlockPredicate ANY = new StrippedBlockPredicate(Optional.empty(), Optional.empty());
         public static final Codec<StrippedBlockPredicate> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                TagAndListSetCodec.of(Registry.BLOCK).optionalFieldOf("block").forGetter(StrippedBlockPredicate::blocks),
+                HolderSetCodec.of(Registry.BLOCK).optionalFieldOf("block").forGetter(StrippedBlockPredicate::blocks),
                 CompoundTag.CODEC.optionalFieldOf("nbtTag").forGetter(StrippedBlockPredicate::nbtTag)
         ).apply(instance, StrippedBlockPredicate::new));
 

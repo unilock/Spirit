@@ -1,11 +1,8 @@
 package me.codexadrian.spirit.items;
 
-import me.codexadrian.spirit.data.Tier;
-import me.codexadrian.spirit.utils.SoulUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;

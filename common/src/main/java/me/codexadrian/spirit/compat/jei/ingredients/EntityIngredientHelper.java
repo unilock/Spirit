@@ -10,11 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 /**
  * This class was largely inspired by or taken from the Resourceful Bees repository with
  * the expressed permission from one of their developers.

@@ -1,7 +1,6 @@
 package me.codexadrian.spirit.items.tools;
 
 import me.codexadrian.spirit.utils.ClientUtils;
-import me.codexadrian.spirit.utils.ToolUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;

@@ -2,7 +2,9 @@ package me.codexadrian.spirit.compat.jei.multiblock;
 
 import me.codexadrian.spirit.recipe.SoulEngulfingRecipe;
 import me.codexadrian.spirit.recipe.SoulfireMultiblock;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.block.Block;
 
 import java.util.*;

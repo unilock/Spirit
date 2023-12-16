@@ -1,6 +1,8 @@
 package me.codexadrian.spirit.registry;
 
-import me.codexadrian.spirit.items.*;
+import me.codexadrian.spirit.items.CrudeSoulCrystalItem;
+import me.codexadrian.spirit.items.MobCrystalItem;
+import me.codexadrian.spirit.items.SoulCrystalItem;
 import me.codexadrian.spirit.items.tools.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;

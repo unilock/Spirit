@@ -1,6 +1,9 @@
 package me.codexadrian.spirit.registry;
 
-import me.codexadrian.spirit.blocks.*;
+import me.codexadrian.spirit.blocks.CrystalPedestalBlock;
+import me.codexadrian.spirit.blocks.PedestalBlock;
+import me.codexadrian.spirit.blocks.SoulCageBlock;
+import me.codexadrian.spirit.blocks.SoulPedestalBlock;
 import me.codexadrian.spirit.blocks.blockentity.PedestalBlockEntity;
 import me.codexadrian.spirit.blocks.blockentity.SoulCageBlockEntity;
 import me.codexadrian.spirit.blocks.blockentity.SoulPedestalBlockEntity;

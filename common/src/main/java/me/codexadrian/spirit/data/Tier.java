@@ -2,8 +2,10 @@ package me.codexadrian.spirit.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.teamresourceful.resourcefullib.common.recipe.CodecRecipe;
 import me.codexadrian.spirit.registry.SpiritMisc;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -14,7 +16,7 @@ import java.util.*;
 public record Tier(ResourceLocation id, String displayName, int requiredSouls, int minSpawnDelay, int maxSpawnDelay,
                    int spawnCount, int spawnRange, int nearbyRange,
                    boolean redstoneControlled, boolean ignoreSpawnConditions,
-                   Set<String> blacklist) implements SyncedData {
+                   Set<String> blacklist) implements CodecRecipe<Container> {
 
     public static Codec<Tier> codec(ResourceLocation id) {
         return RecordCodecBuilder.create(instance -> instance.group(
@@ -30,6 +32,11 @@ public record Tier(ResourceLocation id, String displayName, int requiredSouls, i
                 Codec.BOOL.fieldOf("ignoreSpawnConditions").orElse(false).forGetter(Tier::ignoreSpawnConditions),
                 createSetCodec(Codec.STRING).orElse(new HashSet<>()).fieldOf("blacklist").forGetter(Tier::blacklist)
         ).apply(instance, Tier::new));
+    }
+
+    @Override
+    public boolean matches(Container container, Level level) {
+        return false;
     }
 
     @Override

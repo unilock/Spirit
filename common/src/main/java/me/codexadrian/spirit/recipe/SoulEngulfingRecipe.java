@@ -1,13 +1,9 @@
 package me.codexadrian.spirit.recipe;
 
-import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.teamresourceful.resourcefullib.common.recipe.CodecRecipe;
 import me.codexadrian.spirit.EngulfableItem;
-import me.codexadrian.spirit.data.SyncedData;
 import me.codexadrian.spirit.registry.SpiritMisc;
 import me.codexadrian.spirit.utils.CodecUtils;
 import net.minecraft.core.BlockPos;
@@ -15,6 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,12 +19,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
-import java.util.Optional;
 
 public record SoulEngulfingRecipe(ResourceLocation id, SoulEngulfingInput input, int duration, boolean breaksBlocks,
-                                  Item output, int outputAmount) implements SyncedData {
+                                  Item output, int outputAmount) implements CodecRecipe<Container> {
 
     public static Codec<SoulEngulfingRecipe> codec(ResourceLocation id) {
         return RecordCodecBuilder.create(instance -> instance.group(
@@ -38,6 +35,11 @@ public record SoulEngulfingRecipe(ResourceLocation id, SoulEngulfingInput input,
                 Registry.ITEM.byNameCodec().fieldOf("outputItem").forGetter(SoulEngulfingRecipe::output),
                 Codec.INT.fieldOf("outputAmount").orElse(1).forGetter(SoulEngulfingRecipe::outputAmount)
         ).apply(instance, SoulEngulfingRecipe::new));
+    }
+
+    @Override
+    public boolean matches(Container container, Level level) {
+        return false;
     }
 
     @Override

@@ -1,16 +1,12 @@
 package me.codexadrian.spirit.utils;
 
 import me.codexadrian.spirit.blocks.blockentity.PedestalBlockEntity;
-import net.minecraft.advancements.critereon.BlockPredicate;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

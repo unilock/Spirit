@@ -2,18 +2,21 @@ package me.codexadrian.spirit.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.teamresourceful.resourcefullib.common.recipe.CodecRecipe;
 import me.codexadrian.spirit.registry.SpiritMisc;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Optional;
 
-public record MobTraitData(ResourceLocation id, EntityType<?> entity, List<MobTrait<?>> traits) implements SyncedData {
+public record MobTraitData(ResourceLocation id, EntityType<?> entity, List<MobTrait<?>> traits) implements CodecRecipe<Container> {
 
     public static Codec<MobTraitData> codec(ResourceLocation id) {
         return RecordCodecBuilder.create(instance -> instance.group(
@@ -21,6 +24,11 @@ public record MobTraitData(ResourceLocation id, EntityType<?> entity, List<MobTr
                 Registry.ENTITY_TYPE.byNameCodec().fieldOf("entity").forGetter(MobTraitData::entity),
                 MobTraitRegistry.CODEC.listOf().fieldOf("traits").forGetter(MobTraitData::traits)
         ).apply(instance, MobTraitData::new));
+    }
+
+    @Override
+    public boolean matches(Container container, Level level) {
+        return false;
     }
 
     @Override

@@ -2,33 +2,33 @@ package me.codexadrian.spirit.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import me.codexadrian.spirit.Spirit;
-import me.codexadrian.spirit.data.SyncedData;
-import me.codexadrian.spirit.data.TagAndListSetCodec;
-import me.codexadrian.spirit.registry.SpiritItems;
+import com.teamresourceful.resourcefullib.common.codecs.tags.HolderSetCodec;
+import com.teamresourceful.resourcefullib.common.recipe.CodecRecipe;
 import me.codexadrian.spirit.registry.SpiritMisc;
 import me.codexadrian.spirit.utils.CodecUtils;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Optional;
 
 public record PedestalRecipe(ResourceLocation id, HolderSet<EntityType<?>> entityInput, Optional<Ingredient> activationItem, boolean consumesActivator, List<Ingredient> ingredients,
                              EntityType<?> entityOutput, int duration,
-                             Optional<CompoundTag> outputNbt) implements SyncedData {
+                             Optional<CompoundTag> outputNbt) implements CodecRecipe<Container> {
     public static Codec<PedestalRecipe> codec(ResourceLocation id) {
         return RecordCodecBuilder.create(instance -> instance.group(
                 RecordCodecBuilder.point(id),
-                TagAndListSetCodec.of(Registry.ENTITY_TYPE).fieldOf("entityInput").forGetter(PedestalRecipe::entityInput),
+                HolderSetCodec.of(Registry.ENTITY_TYPE).fieldOf("entityInput").forGetter(PedestalRecipe::entityInput),
                 CodecUtils.INGREDIENT_CODEC.optionalFieldOf("activatorItem").forGetter(PedestalRecipe::activationItem),
                 Codec.BOOL.fieldOf("consumesActivator").orElse(true).forGetter(PedestalRecipe::consumesActivator),
                 CodecUtils.INGREDIENT_CODEC.listOf().fieldOf("itemInputs").forGetter(PedestalRecipe::ingredients),
@@ -36,6 +36,11 @@ public record PedestalRecipe(ResourceLocation id, HolderSet<EntityType<?>> entit
                 Codec.INT.fieldOf("duration").orElse(60).forGetter(PedestalRecipe::duration),
                 CompoundTag.CODEC.optionalFieldOf("outputNbt").forGetter(PedestalRecipe::outputNbt)
         ).apply(instance, PedestalRecipe::new));
+    }
+
+    @Override
+    public boolean matches(Container container, Level level) {
+        return false;
     }
 
     @Override

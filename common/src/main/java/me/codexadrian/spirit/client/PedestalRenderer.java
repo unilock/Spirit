@@ -3,7 +3,6 @@ package me.codexadrian.spirit.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import me.codexadrian.spirit.blocks.blockentity.PedestalBlockEntity;
-import me.codexadrian.spirit.blocks.blockentity.SoulPedestalBlockEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
