@@ -36,20 +36,20 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapper> {
+public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipe> {
 
     public static final ResourceLocation GUI_BACKGROUND = new ResourceLocation(Spirit.MODID, "textures/gui/soul_engulfing.png");
     public static final ResourceLocation ID = new ResourceLocation(Spirit.MODID, "soul_engulfing");
-    public static final RecipeType<SoulEngulfingRecipeWrapper> RECIPE = new RecipeType<>(ID, SoulEngulfingRecipeWrapper.class);
+    public static final RecipeType<SoulEngulfingRecipe> RECIPE = new RecipeType<>(ID, SoulEngulfingRecipe.class);
     private static final double OFFSET = Math.sqrt(512) * .5;
     private int scale = 10;
     public long lastTime;
     private final BlockRenderDispatcher dispatcher;
+    private SoulEngulfingRecipeWrapper wrapper;
 
     public SoulEngulfingCategory(IGuiHelper guiHelper) {
         super(guiHelper,
@@ -64,9 +64,7 @@ public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapp
     }
 
     @Override
-    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, SoulEngulfingRecipeWrapper wrapper, @NotNull IFocusGroup focuses) {
-
-        var recipe = wrapper.getRecipe();
+    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, SoulEngulfingRecipe recipe, @NotNull IFocusGroup focuses) {
         List<ItemStack> items = new ArrayList<>();
         var blocks = recipe.input().multiblock().keys().values();
         var holderSets = blocks.stream().flatMap(predicate -> {
@@ -82,9 +80,11 @@ public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapp
     }
 
     @Override
-    public List<Component> getTooltipStrings(SoulEngulfingRecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+    public List<Component> getTooltipStrings(SoulEngulfingRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        updateWrapper(recipe);
+
         List<Component> components = new ArrayList<>();
-        var tempBlockMap = new ArrayList<>(recipe.blockMap);
+        var tempBlockMap = new ArrayList<>(wrapper.blockMap);
         Collections.reverse(tempBlockMap);
         if (mouseX > 1 && mouseX < 105 && mouseY > 27 && mouseY < 99) {
             for (int i = 0; i < tempBlockMap.size(); i++) {
@@ -93,21 +93,23 @@ public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapp
                     components.add(Component.literal("  ").append(blockMap.blocks().getCurrent().getName()).withStyle(ChatFormatting.GRAY));
                 }
             }
-            if (recipe.getRecipe().breaksBlocks())
+            if (recipe.breaksBlocks())
                 components.add(Component.translatable("spirit.jei.soul_engulfing.consumes").withStyle(ChatFormatting.RED));
         }
         if (mouseX > 107 && mouseX < 129 && mouseY > 83 && mouseY < 98) {
-            components.add(Component.translatable("spirit.jei.soul_engulfing.duration", recipe.getRecipe().duration() * 0.05));
+            components.add(Component.translatable("spirit.jei.soul_engulfing.duration", recipe.duration() * 0.05));
         }
         return components;
     }
 
     @Override
-    public void draw(SoulEngulfingRecipeWrapper recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(SoulEngulfingRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+        updateWrapper(recipe);
+
         long l = System.currentTimeMillis();
 
         if (lastTime + 1500 <= l && !Screen.hasShiftDown()) {
-            recipe.tick();
+            wrapper.tick();
             lastTime = l;
         }
         double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
@@ -119,15 +121,15 @@ public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapp
         stack.pushPose();
         Lighting.setupForFlatItems();
         float scaled = 1.6F * scale;
-        double width = recipe.getMultiblock().pattern().get(0).size() * OFFSET * (scaled/16f);
-        double height = recipe.blockMap.size() * 16 + (66 - recipe.blockMap.size() * OFFSET);
+        double width = wrapper.getMultiblock().pattern().get(0).size() * OFFSET * (scaled/16f);
+        double height = wrapper.blockMap.size() * 16 + (66 - wrapper.blockMap.size() * OFFSET);
         stack.translate(52 - width, height, 100);
         stack.scale(scaled, -scaled, 1);
         stack.mulPose(Vector3f.XP.rotationDegrees(45));
         stack.mulPose(Vector3f.YP.rotationDegrees(45));
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        for (int i = 0; i < Math.min(recipe.blockMap.size(), recipe.layer); i++) {
-            for (SoulEngulfingRecipeWrapper.BlockMap blockMap : recipe.blockMap.get(i)) {
+        for (int i = 0; i < Math.min(wrapper.blockMap.size(), wrapper.layer); i++) {
+            for (SoulEngulfingRecipeWrapper.BlockMap blockMap : wrapper.blockMap.get(i)) {
                 stack.pushPose();
                 stack.translate(blockMap.pos().getX(), blockMap.pos().getY(), blockMap.pos().getZ());
                 dispatcher.renderSingleBlock(blockMap.blocks().getCurrent().defaultBlockState(), stack, bufferSource, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
@@ -140,13 +142,15 @@ public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapp
     }
 
     @Override
-    public boolean handleInput(SoulEngulfingRecipeWrapper recipe, double mouseX, double mouseY, InputConstants.Key input) {
+    public boolean handleInput(SoulEngulfingRecipe recipe, double mouseX, double mouseY, InputConstants.Key input) {
+        updateWrapper(recipe);
+
         if (input.getValue() == InputConstants.KEY_UP) {
-            recipe.layer = Math.min(recipe.layer + 1, recipe.blockMap.size());
+            wrapper.layer = Math.min(wrapper.layer + 1, wrapper.blockMap.size());
             return true;
         }
         if (input.getValue() == InputConstants.KEY_DOWN) {
-            recipe.layer = Math.max(recipe.layer - 1, 0);
+            wrapper.layer = Math.max(wrapper.layer - 1, 0);
             return true;
         }
         if(input.getValue() == InputConstants.KEY_MINUS) {
@@ -160,10 +164,9 @@ public class SoulEngulfingCategory extends BaseCategory<SoulEngulfingRecipeWrapp
         return false;
     }
 
-
-
-    public static List<SoulEngulfingRecipeWrapper> getRecipes(Collection<SoulEngulfingRecipe> recipes) {
-        return recipes.stream().map(SoulEngulfingRecipeWrapper::new).toList();
+    private void updateWrapper(SoulEngulfingRecipe recipe) {
+        if (this.wrapper == null || recipe != this.wrapper.getRecipe()) {
+            this.wrapper = new SoulEngulfingRecipeWrapper(recipe);
+        }
     }
-
 }
